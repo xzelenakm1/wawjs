@@ -7,7 +7,7 @@ const fs = require("fs");
 const EventEmiter = require("events");
 
 class Copier extends EventEmiter {
-  
+
   constructor(from, to) {
     super();
     this._from = from;
@@ -15,12 +15,16 @@ class Copier extends EventEmiter {
   }
   copy() {
 
-    let wasErr;
+    let wasErr, iter = 0;
 
     const stream = fs.createReadStream(this._from);
     stream.on("data", (chunk) => {
       try {
-        fs.appendFileSync(this._to, chunk); //FIXME
+        if(iter == 0)
+          fs.writeFileSync(this._to, chunk);
+        else
+          fs.appendFileSync(this._to, chunk); //FIXME
+        iter = 1;
       } catch (err) {
         wasErr = true;
         this.emit("error", err);
@@ -39,8 +43,3 @@ class Copier extends EventEmiter {
 }
 
 module.exports=Copier;
-
-
-
-
-
